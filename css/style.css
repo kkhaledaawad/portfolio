@@ -154,6 +154,23 @@ body {
 
 .company { color: var(--muted); font-size: 12.5px; margin: -6px 0 12px; }
 
+/* ---- Facebook posts gallery ---- */
+.fb-section { margin-top: 16px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 6px; }
+.page-link { color: var(--accent); text-decoration: none; text-transform: none; letter-spacing: 0; }
+.page-link:hover { text-decoration: underline; }
+.fb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 14px; justify-items: center; }
+.post-card {
+  width: 100%; max-width: 380px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex; flex-direction: column; gap: 8px; align-items: center;
+}
+.fb-post, .fb-video { width: 100%; max-width: 350px; min-height: 140px; }
+.post-fallback { font-size: 12.5px; color: var(--accent); text-decoration: none; }
+.post-fallback:hover { text-decoration: underline; }
+
 /* ---- Featured reels ---- */
 .reels-section { margin-top: 18px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 6px; }
 .reels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
