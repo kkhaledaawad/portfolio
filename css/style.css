@@ -238,6 +238,10 @@ body {
 /* ---- Instagram embeds (same card look as Facebook) ---- */
 .ig-embed { width: 100%; max-width: 350px; min-height: 140px; }
 .ig-embed blockquote { margin: 0 auto; max-width: 350px !important; width: 100%; }
+.tt-embed { width: 100%; max-width: 350px; min-height: 140px; display: flex; justify-content: center; }
+.tt-embed blockquote { margin: 0 auto; max-width: 350px !important; width: 100%; }
+.post-card { overflow: hidden; }
+.post-card iframe, .tt-embed iframe, .ig-embed iframe, .fb-post span, .fb-video span { max-width: 100% !important; }
 
 /* ---- Skills ---- */
 .skills-body { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; padding: 20px 24px; overflow: auto; }
