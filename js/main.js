@@ -101,6 +101,28 @@
     });
   }
 
+  /* ---- Post carousels (one post at a time, arrows + dots) ---- */
+  document.querySelectorAll(".carousel").forEach((car) => {
+    const stage = car.querySelector(".car-stage");
+    const slides = Array.from(stage.children);
+    const dotsBox = car.querySelector(".car-dots");
+    let idx = 0;
+    function show(i) {
+      idx = (i + slides.length) % slides.length;
+      slides.forEach((s, n) => s.classList.toggle("active", n === idx));
+      Array.from(dotsBox.children).forEach((d, n) => d.classList.toggle("active", n === idx));
+    }
+    slides.forEach((_, i) => {
+      const d = document.createElement("button");
+      d.setAttribute("aria-label", "Go to post " + (i + 1));
+      d.addEventListener("click", () => show(i));
+      dotsBox.appendChild(d);
+    });
+    car.querySelector(".car-arrow.prev").addEventListener("click", () => show(idx - 1));
+    car.querySelector(".car-arrow.next").addEventListener("click", () => show(idx + 1));
+    show(0);
+  });
+
   /* ---- Brand switching in Portfolio window ---- */
   const brandItems = Array.from(document.querySelectorAll("#brand-list li[data-brand]"));
   brandItems.forEach((item) => {
