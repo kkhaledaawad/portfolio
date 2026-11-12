@@ -241,6 +241,8 @@ body {
 .tt-embed { width: 100%; max-width: 350px; min-height: 140px; display: flex; justify-content: center; }
 .tt-embed blockquote { margin: 0 auto; max-width: 350px !important; width: 100%; }
 .post-card { overflow: hidden; }
+.embed-slot { width: 100%; display: flex; justify-content: center; min-height: 140px; }
+.embed-slot iframe { border: 0; border-radius: 8px; max-width: 100%; }
 .post-card iframe, .tt-embed iframe, .ig-embed iframe, .fb-post span, .fb-video span { max-width: 100% !important; }
 
 /* ---- Skills ---- */

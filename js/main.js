@@ -101,6 +101,69 @@
     });
   }
 
+  /* ---- Lazy embed loading (keeps phones fast: only visible post loads) ---- */
+  function loadEmbed(slide) {
+    if (!slide || slide.dataset.loaded) return;
+    const type = slide.dataset.embed;
+    const url = slide.dataset.url;
+    const slot = slide.querySelector(".embed-slot");
+    if (!type || !url || !slot) return;
+    slide.dataset.loaded = "1";
+    function whenReady(check, cb, tries) {
+      if (check()) return cb();
+      if ((tries || 0) >= 40) return;
+      setTimeout(() => whenReady(check, cb, (tries || 0) + 1), 500);
+    }
+    if (type === "tt") {
+      const id = (url.match(/video\/(\d+)/) || [])[1];
+      slot.innerHTML =
+        '<iframe src="https://www.tiktok.com/embed/v2/' + id +
+        '" width="325" height="560" style="border:0;border-radius:8px;" allow="fullscreen; encrypted-media; picture-in-picture" allowfullscreen title="TikTok video"></iframe>';
+    } else if (type === "ig") {
+      slot.innerHTML =
+        '<div class="ig-embed"><blockquote class="instagram-media" data-instgrm-permalink="' + url + '" data-instgrm-version="14"></blockquote></div>';
+      whenReady(
+        () => window.instgrm && window.instgrm.embeds,
+        () => window.instgrm.embeds.process(slot)
+      );
+    } else {
+      const cls = type === "fb-video" ? "fb-video" : "fb-post";
+      const st = type === "fb-video" ? "false" : "true";
+      slot.innerHTML =
+        '<div class="' + cls + '" data-href="' + url + '" data-width="350" data-show-text="' + st + '"></div>';
+      whenReady(
+        () => window.FB && window.FB.XFBML,
+        () => window.FB.XFBML.parse(slot)
+      );
+    }
+  }
+
+  /* ---- Hide reach metrics (likes / views / counters) inside embeds ---- */
+  const CROP = { "ig-embed": 118, "fb-post": 46, "fb-video": 0 };
+  const cropObserver = new MutationObserver((muts) => {
+    for (const m of muts) {
+      const f = m.target;
+      if (f.tagName !== "IFRAME" || !f.style.height) continue;
+      const wrap = f.closest(".ig-embed, .fb-post, .fb-video");
+      if (!wrap) continue;
+      const cls = wrap.classList.contains("ig-embed") ? "ig-embed" : wrap.classList.contains("fb-post") ? "fb-post" : "fb-video";
+      const cut = CROP[cls];
+      if (!cut) continue;
+      const h = parseInt(f.style.height, 10);
+      if (!h || isNaN(h)) continue;
+      if (!wrap.dataset.base) {
+        if (h > cut + 200) {
+          wrap.dataset.base = String(h - cut);
+          wrap.style.overflow = "hidden";
+          f.style.height = wrap.dataset.base + "px";
+        }
+      } else if (h !== parseInt(wrap.dataset.base, 10)) {
+        f.style.height = wrap.dataset.base + "px";
+      }
+    }
+  });
+  cropObserver.observe(document.body, { attributes: true, attributeFilter: ["style"], subtree: true });
+
   /* ---- Post carousels (one post at a time, arrows + dots) ---- */
   document.querySelectorAll(".carousel").forEach((car) => {
     const stage = car.querySelector(".car-stage");
@@ -111,7 +174,10 @@
       idx = (i + slides.length) % slides.length;
       slides.forEach((s, n) => s.classList.toggle("active", n === idx));
       Array.from(dotsBox.children).forEach((d, n) => d.classList.toggle("active", n === idx));
+      const panel = car.closest(".brand-panel");
+      if (panel && !panel.classList.contains("hidden")) loadEmbed(slides[idx]);
     }
+    car._show = () => show(idx);
     slides.forEach((_, i) => {
       const d = document.createElement("button");
       d.setAttribute("aria-label", "Go to post " + (i + 1));
@@ -130,6 +196,7 @@
       brandItems.forEach((li) => li.classList.toggle("active", li === item));
       const id = "panel-" + item.dataset.brand;
       document.querySelectorAll(".brand-panel").forEach((p) => p.classList.toggle("hidden", p.id !== id));
+      document.querySelectorAll(".brand-panel:not(.hidden) .carousel").forEach((c) => c._show && c._show());
     });
   });
 
